@@ -127,3 +127,6 @@ func (l *FileLogger) Warn(v ...interface{}) {
 func (l *FileLogger) Error(v ...interface{}) {
 	l.error.Println(v...)
 }
+
+var Clog *ConsoleLogger
+var Flog *FileLogger

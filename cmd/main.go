@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"githu.com/samuelmunyoki/ProxyDNS/handlers"
-	"githu.com/samuelmunyoki/ProxyDNS/utils"
+	"github.com/samuelmunyoki/ProxyDNS/firebase"
+	"github.com/samuelmunyoki/ProxyDNS/handlers"
+	"github.com/samuelmunyoki/ProxyDNS/utils"
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/miekg/dns"
@@ -13,49 +14,56 @@ import (
 
 func main(){
 
-	Clog := utils.NewConsoleLogger()
-	Flog := utils.NewFileLogger(os.Getenv("LOGFILE"))
-	Flog.Info("Starting ProxyDNS ... ")
-	Clog.Info("Starting ProxyDNS ... ")
+	utils.Clog = utils.NewConsoleLogger()
+	utils.Flog = utils.NewFileLogger(os.Getenv("LOGFILE"))
 
-	forwarder := &handlers.Forwarder{ForwardAddr: "8.8.8.8:53"}
+	err := firebase.InitFirestore()
+	if err != nil{
+		utils.Clog.Error(err)
+	}
+
+	utils.Flog.Info("Starting ProxyDNS ... ")
+	utils.Clog.Info("Starting ProxyDNS ... ")
+
+
+
+	forwarder := handlers.NewForwarder()
 
 	// Create handlers with the embedded Forwarder
 	udpHandler := &handlers.HandleUDPReq{Forwarder: forwarder}
+	
 	tcpHandler := &handlers.HandleTCPReq{Forwarder: forwarder}
-
-	
-	
-	go func (){
-		tcpserver := &dns.Server{
-
-			Addr:    ":53",
-			Net:     "tcp",
-			Handler: dns.HandlerFunc(tcpHandler.ServeDNS),
-		}
-		
-
-		fmt.Println("TCP DNS server listening on", tcpserver.Addr)
-		err := tcpserver.ListenAndServe()
-		if err != nil {
-			Clog.Error("Error starting DNS server:", err)
-			Flog.Error("Error starting DNS server:", err)
-		}
-
-	}()
 
 	udpserver := &dns.Server{
 		Addr:    ":53",
 		Net:     "udp",
 		Handler: dns.HandlerFunc(udpHandler.ServeDNS),
 	}
-	
+
+	tcpserver := &dns.Server{
+			Addr:    ":53",
+			Net:     "tcp",
+			Handler: dns.HandlerFunc(tcpHandler.ServeDNS),
+		}
+
+	go func (tcpserver *dns.Server){
+		
+		fmt.Println("TCP DNS server listening on", tcpserver.Addr)
+
+		err := tcpserver.ListenAndServe()
+		if err != nil {
+			utils.Clog.Error("Error starting DNS server:", err)
+			utils.Flog.Error("Error starting DNS server:", err)
+		}
+
+	}(tcpserver)
 
 	fmt.Println("UDP DNS server listening on", udpserver.Addr)
-	err := udpserver.ListenAndServe()
+
+	err = udpserver.ListenAndServe()
 	if err != nil {
-		Clog.Error("Error starting DNS server:", err)
-		Flog.Error("Error starting DNS server:", err)
+		utils.Clog.Error("Error starting DNS server:", err)
+		utils.Flog.Error("Error starting DNS server:", err)
 	}
-	
+    
 }

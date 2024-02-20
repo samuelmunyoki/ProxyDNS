@@ -7,5 +7,5 @@ ProxyDNS is a proxing service that forwards DNS queries to other DNS servers whi
 
 Golang - Let's do stuff fast
 ## Todo
-[] Write good documentation.
-[] Refactor code
+[x] Write good documentation.
+[x] Refactor code

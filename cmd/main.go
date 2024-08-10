@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/samuelmunyoki/ProxyDNS/firebase"
+	// "github.com/samuelmunyoki/ProxyDNS/firebase"
 	"github.com/samuelmunyoki/ProxyDNS/handlers"
 	"github.com/samuelmunyoki/ProxyDNS/utils"
 

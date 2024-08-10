@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/miekg/dns"
-	"github.com/samuelmunyoki/ProxyDNS/firebase"
+	//"github.com/samuelmunyoki/ProxyDNS/firebase"
 	"github.com/samuelmunyoki/ProxyDNS/utils"
 )
 
@@ -37,14 +37,14 @@ func (f *Forwarder) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	for _, question := range r.Question {
 
 		if question.Qtype == dns.TypeA {
-			// fmt.Printf("Question: %s\n", question.Name)
+			fmt.Printf("Question: %s\n", question.Name)
 			for _, answer := range resp.Answer {
 				switch answer.(type) {
 				case *dns.A:
 					if question.Name != f.LastDomain || time.Since(f.LastDomainTime) >= 5*time.Second {
 						f.LastDomain = question.Name
 						f.LastDomainTime = time.Now()
-						go firebase.AddLog(utils.ExtractClientIP(w), question.Name)
+						//go firebase.AddLog(utils.ExtractClientIP(w), question.Name)
 					}
 				default:
 				}

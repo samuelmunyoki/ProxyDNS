@@ -17,10 +17,10 @@ func main(){
 	utils.Clog = utils.NewConsoleLogger()
 	utils.Flog = utils.NewFileLogger(os.Getenv("LOGFILE"))
 
-	err := firebase.InitFirestore()
-	if err != nil{
-		utils.Clog.Error(err)
-	}
+	// err := firebase.InitFirestore()
+	// if err != nil{
+	// 	utils.Clog.Error(err)
+	// }
 
 	utils.Flog.Info("Starting ProxyDNS ... ")
 	utils.Clog.Info("Starting ProxyDNS ... ")
